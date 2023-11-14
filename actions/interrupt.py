@@ -36,4 +36,9 @@ class Interrupt(Action):
         if (not res.ok):
             res.raise_for_status()
 
-        return res.json()['id']
+        res = awxclient.getJobTemplateResult(res.json()['id'])
+
+        if (not res.ok):
+            res.raise_for_status()
+
+        return res.json()

@@ -22,3 +22,9 @@
   saml_request_interval:
     type: "integer"
     description: The number of seconds to wait between attempts to request a SAML authentication.
+  get_job_result_request_attempts_count:
+    type: "integer"
+    description: The number of request get job template result attempts.
+  get_job_result_request_interval:
+    type: "integer"
+    description: The number of seconds to wait between attempts to request a get job template.

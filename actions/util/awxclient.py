@@ -214,8 +214,8 @@ class AwxClient():
         return self.session.delete(self.baseURL+path, verify=False, headers=reqHeader)
     
     def getJobTemplateResult(self, job_template_id):
-        req_count = self.config.get("saml_request_attempts_count", 20) # default: 20 attempts
-        req_interval = self.config.get("saml_request_interval", 90) # default: 90 seconds
+        req_count = self.config.get("get_job_result_request_attempts_count", 20) # default: 20 attempts
+        req_interval = self.config.get("get_job_result_request_interval", 90) # default: 90 seconds
         output_json = {}
         for try_c in range(req_count):
             if try_c != 0:
@@ -244,7 +244,6 @@ class AwxClient():
             output_json['log'] = res.text
 
         return output_json
-    
 
     def getPayloadString(self, payload):
         if not payload:
