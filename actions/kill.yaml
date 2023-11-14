@@ -1,0 +1,97 @@
+---
+  name: "kill"
+  pack: ajs
+  runner_type: "python-script"
+  description: "Kill the Jobnet"
+  enabled: true
+  entry_point: "kill.py"
+  parameters:
+    job_template_name:
+      type: string
+      description: Name of the target job template.
+      required: true
+    job_template_organization:
+      type: string
+      description: Organization name in which the target object belongs.
+      required: true
+    job_template_project:
+      type: string
+      description: Project name in which the target object belongs.
+      required: true
+    job_template_object_id:
+      type: integer
+      description: ID of target job template. This parameter takes precedence over name/project/organization.
+      required: true
+      
+    awx_auth_type:
+      type: string
+      description: Authentication type for logging into AWX.
+      enum:
+        - "basic"
+        - "basic_with_vault_kv2"
+        - "saml"
+        - "saml_with_vault_kv2"
+      default: "saml"
+    awx_vault_backend_name:
+      type: string
+      description: Secret backend name in which the AWX API credential is stored.
+    awx_vault_secret_path:
+      type: string
+      description: Secret path in which credentials for AWX is stored.
+    awx_vault_user_key:
+      type: string
+      description: Key name for AWX user name.
+      default: "user_name"
+    awx_vault_pw_key:
+      type: string
+      description: Key name for AWX user password.
+      default: "password"
+    awx_user_name:
+      type: string
+      description: AWX user name for basic authentication or SAML without Vault.
+    awx_password:
+      type: string
+      description: AWX user PW for basic authentication or SAML without Vault.
+      
+    ajs_secret_with_vault_kv2:
+      type: string
+      description: Checkmark use the AJS secret from Vault or specify it directly.
+      required: true
+    ajs_vault_backend_name:
+      type: string
+      description: Secret backend name in which the AJS API secret information is stored.
+    ajs_vault_secret_path:
+      type: string
+      description: Secret path in which AJS secret information is stored.
+    ajs_manager:
+      type: string
+      description: AJS the manager host name or IP address without using Vault secret.
+    ajs_user_name:
+      type: string
+      description: AJS user name of the manager host without using Vault secret.
+    ajs_password:
+      type: string
+      description: AJS password of the manager host without using Vault secret.
+    ajs_domain:
+      type: string
+      description: AJS domain without using Vault secret.
+    ajs_logical_host_name:
+      type: string
+      description: AJS logical host name of execute target server without using Vault secret.
+    ajs_jp1_user_name:
+      type: string
+      description: AJS user name without using Vault secret.
+    ajs_service_name:
+      type: string
+      description: AJS scheduler service name.
+      required: true
+    ajs_unit_name:
+      type: string
+      description: AJS full name of the unit to be requested.
+      required: true
+    ajs_exec_id:
+      type: string
+      description: AJS execution ID.
+    ajs_exec_registration_number:
+      type: string
+      description: AJS execution registration number to temporarily stop execution.

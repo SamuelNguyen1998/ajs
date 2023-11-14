@@ -1,0 +1,5 @@
+---
+  vault_url: "{{st2kv.system.vault_url}}"
+  vault_role_id: "{{st2kv.system.vault_role_id}}"
+  vault_secret_id: "{{st2kv.system.vault_secret_id}}"
+  awx_base_endpoint: "{{st2kv.system.awx_base_endpoint}}"

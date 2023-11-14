@@ -1,0 +1,9 @@
+---
+name: ajs
+description : Pack management functionality for AJS.
+version : 1.0.0
+python_versions:
+  - "2"
+  - "3"
+author : Ops-I Team.
+email : example@email.com

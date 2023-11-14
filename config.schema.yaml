@@ -1,0 +1,24 @@
+---
+  vault_url:
+    type: "string"
+    description: URL for the Vault server
+    required: true
+  vault_role_id:
+    type: "string"
+    description: The Vault role ID is used on your action or workflow to get the AWX API credential. This ID is stored as encrypted value in the datastore. However, this ID is visible on your action or workflow.
+    required: true
+    secret: true
+  vault_secret_id:
+    type: "string"
+    description: The Vault secret ID is used on your action or workflow to get the AWX API credential. This ID is stored as encrypted value in the datastore. However, this ID is visible on your action or workflow.
+    required: true
+    secret: true
+  awx_base_endpoint:
+    type: "string"
+    description: AWX project URL
+  saml_request_attempts_count:
+    type: "integer"
+    description: The number of SAML authentication attempts.
+  saml_request_interval:
+    type: "integer"
+    description: The number of seconds to wait between attempts to request a SAML authentication.
