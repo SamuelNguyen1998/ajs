@@ -247,7 +247,7 @@ class AwxClient():
                 res.raise_for_status()
             output_json['log'] = res.text
             
-            if data['status'] in ['running', 'pending']:
+            if data['status'] not in ['running', 'pending']:
                 break
 
         return output_json
