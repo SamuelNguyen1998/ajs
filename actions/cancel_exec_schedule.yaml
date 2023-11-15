@@ -84,7 +84,6 @@
     ajs_service_name:
       type: string
       description: AJS scheduler service name.
-      required: true
     ajs_unit_name:
       type: string
       description: AJS full name of the unit to be requested.
