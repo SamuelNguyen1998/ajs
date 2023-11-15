@@ -222,6 +222,10 @@ class AwxClient():
                 time.sleep(req_interval)
 
             res = self.get("/api/v2/jobs/" + str(job_template_id) + "/")
+            
+            #Print output of request
+            self.logger.debug('Get Response "%s"' % (res.content))
+        
             if (not res.ok):
                 res.raise_for_status()
            
