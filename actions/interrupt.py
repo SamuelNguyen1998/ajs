@@ -38,4 +38,4 @@ class Interrupt(Action):
 
         res = awxclient.getJobTemplateResult(res.json()['id'])
 
-        return res.json()
+        return res
