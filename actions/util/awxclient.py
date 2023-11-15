@@ -214,8 +214,8 @@ class AwxClient():
         return self.session.delete(self.baseURL+path, verify=False, headers=reqHeader)
     
     def getJobTemplateResult(self, job_template_id):
-        req_count = self.config.get("get_job_result_request_attempts_count", 360) # default: 360 attempts
-        req_interval = self.config.get("get_job_result_request_interval", 5) # default: 5 seconds
+        req_count = self.config.get("get_job_result_request_attempts_count", 180) # default: 180 attempts
+        req_interval = self.config.get("get_job_result_request_interval", 10) # default: 10 seconds
         output_json = {}
         for try_c in range(req_count):
             if try_c != 0:
