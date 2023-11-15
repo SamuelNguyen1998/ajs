@@ -57,8 +57,9 @@ def buildPayload(config, param, logger):
         payload["ajs_logical_host_name"] = param.get('ajs_logical_host_name')
         payload["ajs_jp1_user_name"] = param.get('ajs_jp1_user_name')
 
-    ajs_authorization = base64.b64encode((payload["ajs_user_name"] + ':' + payload["ajs_password"]).encode())
-    payload["ajs_authorization"] = ajs_authorization.decode()
+    if payload["ajs_user_name"] is not None and payload["ajs_password"] is not None:
+        ajs_authorization = base64.b64encode((payload["ajs_user_name"] + ':' + payload["ajs_password"]).encode())
+        payload["ajs_authorization"] = ajs_authorization.decode()
     
     payload["ajs_service_name"] = param.get('ajs_service_name')
     payload["ajs_unit_name"] = param.get('ajs_unit_name')
