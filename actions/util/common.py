@@ -2,7 +2,8 @@ import hvac
 import base64
 import json
 
-def buildPayload(config, param, logger):  
+def buildPayload(config, param, logger):
+    extra_vars = {}  
     payload = {}
     if param.get('ajs_secret_with_vault_kv2').lower() == "true":
         
@@ -66,4 +67,5 @@ def buildPayload(config, param, logger):
     payload["ajs_exec_id"] = param.get('ajs_exec_id')
     payload["ajs_exec_registration_number"] = param.get('ajs_exec_registration_number')
 
-    return json.dumps(payload)
+    extra_vars["extra_vars"] = payload
+    return json.dumps(extra_vars)
