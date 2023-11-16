@@ -214,6 +214,7 @@ class AwxClient():
         return self.session.delete(self.baseURL+path, verify=False, headers=reqHeader)
     
     def getJobTemplateResult(self, job_template_id):
+        # Interval time wait between attempts to request is 10s, Time out (10 seconds * 180 attempts) is 30 minutes.
         req_count = self.config.get("get_job_result_request_attempts_count", 180) # default: 180 attempts
         req_interval = self.config.get("get_job_result_request_interval", 10) # default: 10 seconds
         output_json = {}
@@ -235,19 +236,17 @@ class AwxClient():
             for item in ('id', 'name', 'status'):
                 output_json[item] = data.get(item)
 
-            if data['status'] in ['running', 'pending']:
+            if data['status'] in ['new', 'pending', 'waiting', 'running']:
                 continue
+            else:
+                res = self.get(
+                        "/api/v2/jobs/" + str(job_template_id) + "/stdout/",
+                        params={"format": "txt"})
 
-            res = self.get(
-                    "/api/v2/jobs/" + str(job_template_id) + "/stdout/",
-                    params={"format": "txt"})
-
-            #Raise error if status not ok
-            if (not res.ok):
-                res.raise_for_status()
-            output_json['log'] = res.text
-            
-            if data['status'] not in ['running', 'pending']:
+                #Raise error if status not ok
+                if (not res.ok):
+                    res.raise_for_status()
+                output_json['log'] = res.text
                 break
 
         return output_json
