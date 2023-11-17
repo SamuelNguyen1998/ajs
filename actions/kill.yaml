@@ -27,8 +27,6 @@
       type: string
       description: Authentication type for logging into AWX.
       enum:
-        - "basic"
-        - "basic_with_vault_kv2"
         - "saml"
         - "saml_with_vault_kv2"
       default: "saml"
