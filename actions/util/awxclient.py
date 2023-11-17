@@ -3,7 +3,6 @@ import time
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 import hvac
-import base64
 import json
 
 class AwxClient():
@@ -14,7 +13,7 @@ class AwxClient():
         self.baseURL = config['awx_base_endpoint']
         self.token_id = 0
 
-        if param.get('awx_auth_type') in ['basic_with_vault_kv2', 'saml_with_vault_kv2']:
+        if param.get('awx_auth_type') == 'saml_with_vault_kv2':
 
             vclient = hvac.Client(config['vault_url'])
 
@@ -62,92 +61,66 @@ class AwxClient():
     def __del__(self):
         if self.tokenHeader == {}:
             return
-
-        if self.param.get('awx_auth_type') in ['saml', 'saml_with_vault_kv2']:
-            self.get('/api/logout/')
-        else:
-            self.delete('/api/v2/tokens/' + self.token_id)
+        self.get('/api/logout/')
 
     def getRequestHeader(self):
         s = requests.Session()
         self.session = s
 
-        if self.param.get("awx_auth_type") in ['saml', 'saml_with_vault_kv2']:
+        #with SAML
+        action_url = ''
+        saml_req_c = self.config.get("saml_request_attempts_count", 12) # default: 12 attempts
+        saml_req_interval = self.config.get("saml_request_interval", 5) # default: 5 seconds
+        data_params = {}
+        for try_c in range(saml_req_c):
+            if try_c != 0:
+                time.sleep(saml_req_interval)
 
-            #with SAML
-
-            action_url = ''
-            saml_req_c = self.config.get("saml_request_attempts_count", 12) # default: 12 attempts
-            saml_req_interval = self.config.get("saml_request_interval", 5) # default: 5 seconds
-            data_params = {}
-            for try_c in range(saml_req_c):
-                if try_c != 0:
-                    time.sleep(saml_req_interval)
-
-                rsp = s.get(self.baseURL + '/sso/login/saml/', verify=False, params={'idp': 'myidp'})
-
-                if rsp.status_code != 200:
-                    raise Exception('failed to login')
-
-                soup = BeautifulSoup(rsp.text, "html.parser")
-                kc_login=soup.find("form", id="kc-form-login")
-                if isinstance(kc_login, type(None)):
-                    continue # retry
-
-                rsp = s.post(kc_login["action"], verify=False,
-                             data={'username': self.username, 'password': self.password, 'credentialId': ''})
-                # print('authentication response')
-
-                soup = BeautifulSoup(rsp.text, "html.parser")
-                if soup.find("form", id="kc-form-login"):
-                    raise Exception('authentication failure')
-
-                for saml_comp in soup.find_all("form"):
-                    if ("name", "saml-post-binding") in saml_comp.attrs.items() and "action" in saml_comp.attrs:
-                        action_url = saml_comp["action"]
-                        form_inputs = saml_comp.find_all("input")
-                        for input_item in form_inputs:
-                            if input_item["type"] == "hidden":
-                                data_params[input_item["name"]] = input_item["value"]
-                        break # authentication success
-
-                if action_url != '':
-                    break # authentication access
-            else:
-                raise Exception('authentication failure')
-
-            rsp = s.post(action_url, verify=False, data=data_params)
-
-            awxURLO = urlparse(action_url)
-            self.baseURL = awxURLO.scheme + '://' + awxURLO.netloc
-
-            rsp = s.get(self.baseURL + '/api/', verify=False)
-            csrf = rsp.cookies.get("csrftoken", domain=awxURLO.hostname)
-
-            if csrf == '':
-                raise Exception('failed to get a CSRF token')
-
-            self.tokenHeader = {'Referer': self.baseURL + '/', "X-CSRFToken": csrf}
-            rsp = s.get(self.baseURL+'/api/v2/me/', verify=False, headers=self.tokenHeader) # check a CSRF token
-
-        else:
-
-            #without SAML
-            rsp = s.post(
-                  self.baseURL + '/api/v2/tokens/',
-                  verify=False,
-                  headers={
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Basic ' + base64.b64encode((self.username + ':' + self.password).encode())},
-                  data={'scope': 'write'})
+            rsp = s.get(self.baseURL + '/sso/login/saml/', verify=False, params={'idp': 'myidp'})
 
             if rsp.status_code != 200:
                 raise Exception('failed to login')
 
-            json_data = rsp.json()
-            self.tokenHeader = {'Authorization': 'Bearer ' + json_data.get("token")}
-            self.token_id = json_data.get("id")
-            rsp = s.get(self.baseURL+'/api/v2/me/', verify=False, headers=self.tokenHeader) # check a token
+            soup = BeautifulSoup(rsp.text, "html.parser")
+            kc_login=soup.find("form", id="kc-form-login")
+            if isinstance(kc_login, type(None)):
+                continue # retry
+
+            rsp = s.post(kc_login["action"], verify=False,
+                         data={'username': self.username, 'password': self.password, 'credentialId': ''})
+            # print('authentication response')
+
+            soup = BeautifulSoup(rsp.text, "html.parser")
+            if soup.find("form", id="kc-form-login"):
+                raise Exception('authentication failure')
+
+            for saml_comp in soup.find_all("form"):
+                if ("name", "saml-post-binding") in saml_comp.attrs.items() and "action" in saml_comp.attrs:
+                    action_url = saml_comp["action"]
+                    form_inputs = saml_comp.find_all("input")
+                    for input_item in form_inputs:
+                        if input_item["type"] == "hidden":
+                            data_params[input_item["name"]] = input_item["value"]
+                    break # authentication success
+
+            if action_url != '':
+                break # authentication access
+        else:
+            raise Exception('authentication failure')
+
+        rsp = s.post(action_url, verify=False, data=data_params)
+
+        awxURLO = urlparse(action_url)
+        self.baseURL = awxURLO.scheme + '://' + awxURLO.netloc
+
+        rsp = s.get(self.baseURL + '/api/', verify=False)
+        csrf = rsp.cookies.get("csrftoken", domain=awxURLO.hostname)
+
+        if csrf == '':
+            raise Exception('failed to get a CSRF token')
+
+        self.tokenHeader = {'Referer': self.baseURL + '/', "X-CSRFToken": csrf}
+        rsp = s.get(self.baseURL+'/api/v2/me/', verify=False, headers=self.tokenHeader) # check a CSRF token
 
     def getJsonTypeHeader(self):
         if self.tokenHeader == {}:
