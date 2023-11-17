@@ -46,10 +46,10 @@
       default: "password"
     awx_user_name:
       type: string
-      description: AWX user name for basic authentication or SAML without Vault.
+      description: AWX user name for SAML without Vault.
     awx_password:
       type: string
-      description: AWX user PW for basic authentication or SAML without Vault.
+      description: AWX user PW for SAML without Vault.
       
     ajs_secret_with_vault_kv2:
       type: string
