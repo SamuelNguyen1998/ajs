@@ -212,7 +212,7 @@ class AwxClient():
     def delete(self, path):
         reqHeader = self.getJsonTypeHeader()
         return self.session.delete(self.baseURL+path, verify=False, headers=reqHeader)
-    
+
     def getJobTemplateResult(self, job_template_id):
         # Interval time wait between attempts to request is 10s, Time out (10 seconds * 180 attempts) is 30 minutes.
         req_count = self.config.get("get_job_result_request_attempts_count", 180) # default: 180 attempts

@@ -72,9 +72,6 @@
     ajs_password:
       type: string
       description: AJS password of the manager host without using Vault secret.
-    ajs_domain:
-      type: string
-      description: AJS domain without using Vault secret.
     ajs_logical_host_name:
       type: string
       description: AJS logical host name of execute target server without using Vault secret.
@@ -88,9 +85,6 @@
       type: string
       description: AJS full name of the unit to be requested.
       required: true
-    ajs_exec_id:
-      type: string
-      description: AJS execution ID.
     ajs_exec_registration_number:
       type: string
       description: AJS execution registration number to temporarily stop execution.
